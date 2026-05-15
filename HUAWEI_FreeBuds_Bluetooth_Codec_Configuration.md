@@ -275,3 +275,78 @@ Note: User-specific configs in `~/.config/wireplumber/` take precedence over sys
   - Configured SBC-XQ as default codec for HUAWEI FreeBuds SE 4 ANC
   - Disabled auto-switching to HFP profile
   - Documented manual codec switching commands
+
+## Audio Volume Persistence (alsactl)
+
+By default, Linux audio volume resets to max on every fresh boot. `alsactl` saves and restores the ALSA hardware mixer state across reboots, preserving your volume level.
+
+### How It Works
+
+- **Save**: Triggered on shutdown/logout via systemd
+- **Restore**: Triggered on boot/login via systemd
+- Stores volume state in `~/.config/asound.state`
+
+### Setup
+
+#### 1. Create save service (runs on shutdown)
+```bash
+mkdir -p ~/.config/systemd/user
+cat > ~/.config/systemd/user/alsa-volume-save.service << 'EOF'
+[Unit]
+Description=Save ALSA mixer volume state
+DefaultDependencies=no
+Before=shutdown.target
+
+[Service]
+Type=oneshot
+ExecStart=/bin/true
+ExecStopPost=/usr/bin/alsactl --file $HOME/.config/asound.state store
+
+[Install]
+WantedBy=shutdown.target
+EOF
+```
+
+#### 2. Create restore service (runs on login)
+```bash
+cat > ~/.config/systemd/user/alsa-volume-restore.service << 'EOF'
+[Unit]
+Description=Restore ALSA mixer volume state
+After=pipewire.service wireplumber.service
+Requires=pipewire.service
+
+[Service]
+Type=oneshot
+ExecStart=/usr/bin/alsactl --file $HOME/.config/asound.state restore
+
+[Install]
+WantedBy=default.target
+EOF
+```
+
+#### 3. Enable both services
+```bash
+systemctl --user enable --now alsa-volume-save.service
+systemctl --user enable --now alsa-volume-restore.service
+```
+
+### Manual Commands
+
+```bash
+# Save current volume state
+alsactl --file ~/.config/asound.state store
+
+# Restore saved volume state
+alsactl --file ~/.config/asound.state restore
+
+# View saved state
+cat ~/.config/asound.state
+```
+
+### Notes
+
+- **Important**: systemd user services do not expand `~` in paths — use `$HOME/.config/` instead of `~/.config/`
+- `alsactl` controls **hardware/ALSA level** volume (built-in speakers, headphone jack)
+- **Does not** persist PipeWire/Bluetooth sink volume — those are separate from ALSA
+- If you also want to persist Bluetooth device volume, see the WirePlumber state fix in Troubleshooting above
+- Requires `alsa-utils` package: `sudo pacman -S alsa-utils`
