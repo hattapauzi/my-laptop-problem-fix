@@ -1,6 +1,6 @@
 # Hibernation Swapfile Configuration Guide
 
-Date: 2026-05-07
+Date: 2026-05-19
 System: CachyOS / Arch-based Linux, Btrfs on LUKS encryption
 
 ## Overview
@@ -141,16 +141,24 @@ Create file: `/etc/polkit-1/rules.d/50-hibernate.rules`
 ```javascript
 // Allow specified user to hibernate without password
 polkit.addRule(function(action, subject) {
-    if (action.id !== "org.freedesktop.systemd1.manage-units") {
+    if (!subject.active || !subject.local) {
         return polkit.Result.NOT_HANDLED;
     }
 
-    if (subject.user !== "your_username" || !subject.active || !subject.local) {
+    if (subject.user !== "your_username") {
         return polkit.Result.NOT_HANDLED;
     }
 
-    if (action.lookup("unit") === "systemd-hibernate.service" &&
-        action.lookup("verb") === "start") {
+    // Allow starting systemd-hibernate.service
+    if (action.id === "org.freedesktop.systemd1.manage-units") {
+        if (action.lookup("unit") === "systemd-hibernate.service" &&
+            action.lookup("verb") === "start") {
+            return polkit.Result.YES;
+        }
+    }
+
+    // Allow logind Hibernate D-Bus method
+    if (action.id === "org.freedesktop.login1.hibernate") {
         return polkit.Result.YES;
     }
 
@@ -161,15 +169,41 @@ polkit.addRule(function(action, subject) {
 Set proper permissions:
 
 ```bash
-sudo chmod 0640 /etc/polkit-1/rules.d/50-hibernate.rules
 sudo chown root:polkitd /etc/polkit-1/rules.d/50-hibernate.rules
+sudo chmod 640 /etc/polkit-1/rules.d/50-hibernate.rules
 ```
 
-Reload polkit:
+Reload polkit and restart DMS:
 
 ```bash
-sudo systemctl reload polkit.service
+sudo systemctl restart polkit.service
+systemctl --user restart dms.service
 ```
+
+### Troubleshooting Polkit Issues
+
+If authentication still fails after applying the polkit rule:
+
+1. **Check polkit logs for rule loading errors:**
+   ```bash
+   journalctl -u polkit.service | grep -i "error\|loading"
+   ```
+
+2. **Verify rule file permissions:**
+   ```bash
+   ls -la /etc/polkit-1/rules.d/50-hibernate.rules
+   # Should show: -rw-r----- 1 root polkitd
+   ```
+
+3. **Restart polkit completely:**
+   ```bash
+   sudo systemctl restart polkit.service
+   ```
+
+4. **Restart DMS to pick up changes:**
+   ```bash
+   systemctl --user restart dms.service
+   ```
 
 ## Verification Commands
 
@@ -245,3 +279,9 @@ The hibernation configuration requires:
   - Configured Btrfs swapfile for hibernation
   - Set up passwordless hibernate via polkit
   - Integrated with Dank Material Shell power menu
+
+- **2026-05-19**: Updated polkit troubleshooting section
+  - Fixed polkit rule file permissions (owner must be `polkitd`, mode `640`)
+  - Added `org.freedesktop.login1.hibernate` to polkit rule for broader compatibility
+  - Added DMS restart step after polkit changes
+  - Added troubleshooting section for common polkit issues
