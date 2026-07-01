@@ -23,3 +23,12 @@ Configure SBC-XQ audio codec for HUAWEI FreeBuds SE 4 ANC on Linux with PipeWire
 - Forcing specific Bluetooth audio codec
 - Manual codec switching commands
 - Troubleshooting audio issues
+
+### [DNS Configuration Guide](./DNS_Configuration_Guide.md)
+Configure system-wide DNS with Cloudflare/Google and DNS over TLS for encrypted queries.
+
+**Topics covered:**
+- systemd-resolved configuration
+- NetworkManager global DNS defaults
+- DNS over TLS for encrypted queries
+- Applying DNS to all network connections
