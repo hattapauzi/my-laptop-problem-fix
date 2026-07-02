@@ -32,3 +32,18 @@ Configure system-wide DNS with Cloudflare/Google and DNS over TLS for encrypted 
 - NetworkManager global DNS defaults
 - DNS over TLS for encrypted queries
 - Applying DNS to all network connections
+
+### [Forge ZSH `:` Commands Not Working in Tmux](./Forge_ZSH_Tmux_Completion_Fix.md)
+Fix Forge `:` command completion showing zsh history modifiers instead of Forge's command picker inside tmux.
+
+**Topics covered:**
+- `.zprofile` double-sourcing `.zshrc` causing fzf to override forge Tab binding in tmux login shells
+- Difference between login shells (tmux) and non-login shells (direct terminal)
+
+### [Forge ZSH P10k Prompt Segments Not Refreshing After `:model`](./Forge_ZSH_P10k_Prompt_Refresh_Fix.md)
+Fix Powerlevel10k prompt segments (model name, token count) not refreshing after Forge `:` commands, with screen artifacts when forcing a refresh.
+
+**Topics covered:**
+- p10k prompt segments only re-evaluated during `precmd` (not `zle reset-prompt`)
+- Scheduling prompt rebuild via p10k's own `_p9k_restore_prompt` deferred mechanism (`zle -F` on `/dev/null`)
+- Avoiding screen artifacts (blank lines, `%` markers) from inline prompt rebuilds
