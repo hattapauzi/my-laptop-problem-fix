@@ -33,6 +33,16 @@ Configure system-wide DNS with Cloudflare/Google and DNS over TLS for encrypted 
 - DNS over TLS for encrypted queries
 - Applying DNS to all network connections
 
+### [BedrockOnLinux Flatpak Menu Crash Workaround](./BedrockOnLinux_Flatpak_Crash_Fix.md)
+Work around the Minecraft menu crash at `0x140427AB5` by rolling BedrockOnLinux back from `2.1.1`/`native12` to the verified `2.1.0`/`native6` combination.
+
+**Topics covered:**
+- Identifying the repeatable Wine page-fault signature
+- Installing and verifying the `2.1.0` Flatpak at user scope
+- Correcting the rollback package's read-only data mount
+- Activating the `native6` managed engine without resetting game data
+- Verifying clean launch and reverting after an upstream fix
+
 ### [Forge ZSH `:` Commands Not Working in Tmux](./Forge_ZSH_Tmux_Completion_Fix.md)
 Fix Forge `:` command completion showing zsh history modifiers instead of Forge's command picker inside tmux.
 
