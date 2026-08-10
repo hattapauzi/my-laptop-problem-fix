@@ -57,3 +57,13 @@ Fix Powerlevel10k prompt segments (model name, token count) not refreshing after
 - p10k prompt segments only re-evaluated during `precmd` (not `zle reset-prompt`)
 - Scheduling prompt rebuild via p10k's own `_p9k_restore_prompt` deferred mechanism (`zle -F` on `/dev/null`)
 - Avoiding screen artifacts (blank lines, `%` markers) from inline prompt rebuilds
+
+### [Thunar GTK Theme Configuration Guide](./Thunar_GTK_Theme_Configuration_Guide.md)
+Inspect the active GTK theme and icon settings used by Thunar file manager and replicate the identical configuration across other systems.
+
+**Topics covered:**
+- Identifying active GTK theme (`catppuccin-mocha-rosewater-standard+default`), icon theme (`Adwaita`), and color preference (`prefer-dark`)
+- Commands for querying GTK/XFCE/dconf settings (`gsettings`, `xfconf-query`, `settings.ini`)
+- Installing Catppuccin GTK theme via AUR package or manual download
+- Configuring GTK 3.0/4.0 `settings.ini`, `gsettings`, `xfconf-query`, and shell environment variables
+
