@@ -58,6 +58,15 @@ Fix Powerlevel10k prompt segments (model name, token count) not refreshing after
 - Scheduling prompt rebuild via p10k's own `_p9k_restore_prompt` deferred mechanism (`zle -F` on `/dev/null`)
 - Avoiding screen artifacts (blank lines, `%` markers) from inline prompt rebuilds
 
+### [LazyGit Clipboard Copy Through SSH and Tmux](./LazyGit_SSH_Tmux_Clipboard_Fix.md)
+Fix LazyGit commit-copy actions failing on a headless remote system by forwarding copied text to the local clipboard with OSC 52.
+
+**Topics covered:**
+- Why Neovim yanks can work while LazyGit copying fails
+- Configuring LazyGit's `os.copyToClipboardCmd` for OSC 52
+- Wrapping OSC 52 sequences for tmux passthrough
+- Required tmux and terminal clipboard settings
+
 ### [Thunar GTK Theme Configuration Guide](./Thunar_GTK_Theme_Configuration_Guide.md)
 Inspect the active GTK theme and icon settings used by Thunar file manager and replicate the identical configuration across other systems.
 
